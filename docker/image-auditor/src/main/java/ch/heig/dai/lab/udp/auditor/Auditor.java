@@ -1,6 +1,6 @@
-package ch.heig.dai.lab.udp;
+package ch.heig.dai.lab.udp.auditor;
 
-public class Main {
+public class Auditor {
     public static void main(String[] args) {
         System.out.println("Hello world!");
     }
