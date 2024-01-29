@@ -5,6 +5,7 @@ jspm_packages/
 
 # Java
 **/target/
+.idea/**
 
 # Optional npm cache directory
 .npm
