@@ -1,6 +1,7 @@
 package ch.heig.dai.lab.udp.auditor;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.*;
 import java.net.*;
@@ -19,6 +20,10 @@ public class Auditor {
     private final static int TCP_PORT = 2205;
     private static List<Musician> activeMusicians = new ArrayList<>();
     private final static HashMap<String, String> instrumentSounds = new HashMap<>();
+
+    private final Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .create();
 
     static {
         // Fill in the instrument list with their sound.
@@ -40,7 +45,6 @@ public class Auditor {
                     // Removes the musicians who are inactive for 5 seconds.
                     activeMusicians.removeIf(musician -> musician.getLastActivity() < System.currentTimeMillis() - 5000);
 
-                    Gson gson = new Gson();
                     String message = gson.toJson(activeMusicians);
 
                     out.write(message);
@@ -69,16 +73,20 @@ public class Auditor {
                 socket.receive(packet);
                 String message = new String(packet.getData(), 0, packet.getLength(), UTF_8);
 
-                Gson gson = new Gson();
                 Sound sound = gson.fromJson(message, Sound.class);
 
-                Musician musician = new Musician(sound.getUuid(), instrumentSounds.get(sound.getSound()), sound.getLastActivity());
+                Musician musician = new Musician(sound.getUuid(), instrumentSounds.get(sound.getSound()));
 
-                // Removes the old musician.
-                activeMusicians.removeIf(existingMusician -> existingMusician.equals(musician));
-
-                // Adds the same musician with his lastActivity time updated.
-                activeMusicians.add(musician);
+                if(!activeMusicians.contains(musician)){
+                    // Adds the musician
+                    activeMusicians.add(musician);
+                }else {
+                    for(var m : activeMusicians){
+                        if(m.equals(musician)){
+                            m.setLastActivity(System.currentTimeMillis());
+                        }
+                    }
+                }
 
                 System.out.println("Received message: " + message);
                 packet.setLength(buffer.length);

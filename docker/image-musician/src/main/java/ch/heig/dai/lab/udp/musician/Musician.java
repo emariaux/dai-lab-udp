@@ -37,8 +37,8 @@ public class Musician {
     @Expose
     private String sound;
 
-    @Expose
-    private long lastActivity;
+    //@Expose
+    //private long lastActivity;
 
     static {
         // Fill in the instrument list with their sound.
@@ -53,7 +53,7 @@ public class Musician {
         uuid = UUID.randomUUID();
         sound = instrumentSounds.get(instrument.toUpperCase());
         this.instrument = instrument;
-        lastActivity = System.currentTimeMillis();
+        //lastActivity = System.currentTimeMillis();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class Musician {
             InetSocketAddress dest_address = new InetSocketAddress(IPADDRESS, PORT);
 
             // Updates the last activity time before sending the new packet.
-            musician.setLastActivity(System.currentTimeMillis());
+           // musician.setLastActivity(System.currentTimeMillis());
 
             byte[] payload = musician.toString().getBytes(UTF_8);
             var packet = new DatagramPacket(payload, payload.length, dest_address);

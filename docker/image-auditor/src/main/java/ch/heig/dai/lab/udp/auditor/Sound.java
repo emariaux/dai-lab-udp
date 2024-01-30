@@ -10,11 +10,9 @@ import java.util.UUID;
 public class Sound {
     private UUID uuid;
     private String sound;
-    private long lastActivity;
 
-    public Sound(UUID uuid, String sound, long lastActivity) {
+    public Sound(UUID uuid, String sound) {
         this.uuid = uuid;
         this.sound = sound;
-        this.lastActivity = lastActivity;
     }
 }

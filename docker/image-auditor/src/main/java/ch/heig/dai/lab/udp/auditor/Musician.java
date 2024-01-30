@@ -1,5 +1,8 @@
 package ch.heig.dai.lab.udp.auditor;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,14 +13,15 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Musician {
+
     private UUID uuid;
     private String instrument;
     private long lastActivity;
 
-    public Musician(UUID uuid, String instrument, long lastActivity) {
+    public Musician(UUID uuid, String instrument) {
         this.uuid = uuid;
         this.instrument = instrument;
-        this.lastActivity = lastActivity;
+        this.lastActivity = System.currentTimeMillis();
     }
 
     @Override
