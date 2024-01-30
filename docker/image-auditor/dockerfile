@@ -11,9 +11,9 @@ COPY src /app/src
 # Compiles the application with maven.
 RUN mvn -B clean package
 
-# Creates a Docker image based on Alpine Linux and install OpenJDK 20 on it.
+# Creates a Docker image based on Alpine Linux and install OpenJDK 21 on it.
 FROM alpine:latest
-RUN apk add --no-cache openjdk20
+RUN apk add --no-cache openjdk21
 
 # Definies the workdir.
 WORKDIR /app
@@ -22,4 +22,4 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar /app/app.jar
 
 # Runs the application.
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

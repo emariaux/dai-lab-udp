@@ -1,42 +1,22 @@
 package ch.heig.dai.lab.udp.auditor;
 
-import java.time.Instant;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Objects;
+import java.util.UUID;
 
+
+@Getter
+@Setter
 public class Musician {
-    private final String uuid;
-    private final Instrument instrument;
-    private Instant firstActivity;
-    private Instant lastActivity;
+    private UUID uuid;
+    private String instrument;
+    private long lastActivity;
 
-    public Musician(String uuid, Instrument instrument, Instant firstActivity, Instant lastActivity) {
+    public Musician(UUID uuid, String instrument, long lastActivity) {
         this.uuid = uuid;
         this.instrument = instrument;
-        this.firstActivity = firstActivity;
-        this.lastActivity = lastActivity;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public Instrument getInstrument() {
-        return instrument;
-    }
-
-    public Instant getFirstActivity() {
-        return firstActivity;
-    }
-
-    public void setFirstActivity(Instant firstActivity) {
-        this.firstActivity = firstActivity;
-    }
-
-    public Instant getLastActivity() {
-        return lastActivity;
-    }
-
-    public void setLastActivity(Instant lastActivity) {
         this.lastActivity = lastActivity;
     }
 
@@ -45,11 +25,10 @@ public class Musician {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Musician musician = (Musician) o;
-        return Objects.equals(uuid, musician.uuid) && instrument == musician.instrument;
+        return Objects.equals(uuid, musician.uuid);
     }
 
-    @Override
     public int hashCode() {
-        return Objects.hash(uuid, instrument);
+        return Objects.hash(uuid);
     }
 }
