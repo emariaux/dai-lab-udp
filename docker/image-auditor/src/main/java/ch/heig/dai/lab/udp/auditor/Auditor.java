@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +35,6 @@ public class Auditor {
             while (true) {
 
                 try (Socket socket = serverSocket.accept();
-                     var in = new BufferedReader(new InputStreamReader(socket.getInputStream(), UTF_8));
                      var out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8))) {
 
                     // Removes the musicians who are inactive for 5 seconds.
@@ -44,6 +44,7 @@ public class Auditor {
                     String message = gson.toJson(activeMusicians);
 
                     out.write(message);
+                    out.flush();
 
                 } catch (IOException e) {
                     System.out.println("Server: socket ex.: " + e);
@@ -60,29 +61,29 @@ public class Auditor {
             NetworkInterface netif = NetworkInterface.getByName("eth0");
             socket.joinGroup(group_address, netif);
 
-            try{
-                while (true){
-                    byte[] buffer = new byte[1024];
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                    socket.receive(packet);
-                    String message = new String(packet.getData(), 0, packet.getLength(), UTF_8);
+            byte[] buffer = new byte[1024];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
-                    Gson gson = new Gson();
-                    Sound sound = gson.fromJson(message, Sound.class);
 
-                    Musician musician = new Musician(sound.getUuid(), instrumentSounds.get(sound.getSound()), sound.getLastActivity());
+            while (true) {
+                socket.receive(packet);
+                String message = new String(packet.getData(), 0, packet.getLength(), UTF_8);
 
-                    // Removes the old musician.
-                    activeMusicians.removeIf(existingMusician -> existingMusician.equals(musician));
+                Gson gson = new Gson();
+                Sound sound = gson.fromJson(message, Sound.class);
 
-                    // Adds the same musician with his lastActivity time updated.
-                    activeMusicians.add(musician);
+                Musician musician = new Musician(sound.getUuid(), instrumentSounds.get(sound.getSound()), sound.getLastActivity());
 
-                    System.out.println("Received message: " + message);
-                }
-            } finally {
-                socket.leaveGroup(group_address, netif);
+                // Removes the old musician.
+                activeMusicians.removeIf(existingMusician -> existingMusician.equals(musician));
+
+                // Adds the same musician with his lastActivity time updated.
+                activeMusicians.add(musician);
+
+                System.out.println("Received message: " + message);
+                packet.setLength(buffer.length);
             }
+
         }
         catch (IOException ex) {
             System.out.println(ex.getMessage());
@@ -93,8 +94,8 @@ public class Auditor {
         Auditor auditor = new Auditor();
 
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()){
-            executor.execute(auditor::sendMusiciansList);
-            executor.execute(auditor::receiveMusicianSounds);
+            executor.submit(auditor::sendMusiciansList);
+            executor.submit(auditor::receiveMusicianSounds);
         }
     }
 }
