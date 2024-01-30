@@ -29,6 +29,7 @@ public class Musician {
     private final static HashMap<String, String> instrumentSounds = new HashMap<>();
     private final Gson gson = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
+            .setPrettyPrinting()
             .create();
     @Expose
     private UUID uuid;

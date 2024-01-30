@@ -13,9 +13,17 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Musician {
-
+    private final Gson gson = new GsonBuilder()
+            .excludeFieldsWithoutExposeAnnotation()
+            .setPrettyPrinting()
+            .create();
+    @Expose
     private UUID uuid;
+
+    @Expose
     private String instrument;
+
+    @Expose
     private long lastActivity;
 
     public Musician(UUID uuid, String instrument) {
