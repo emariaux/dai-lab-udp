@@ -12,6 +12,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -20,20 +22,26 @@ public class Musician {
     private final static String IPADDRESS = "239.255.22.5";
     private final static int PORT = 9904;
 
+    private final static HashMap<String, String> instrumentSounds = new HashMap<>();
     private final Gson gson = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
-            .registerTypeAdapter(Instrument.class, (JsonSerializer<Instrument>) (src, typeOfSrc, context) -> new JsonPrimitive(src.getSound()))
             .create();
     @Expose
     private UUID uuid;
 
-    @SerializedName("sound")
+    private String instrument;
     @Expose
-    private Instrument instrument;
+    private String sound;
 
-    public Musician(Instrument instrument){
+    @Expose
+    private long lastActivity;
+
+
+    public Musician(String instrument){
         uuid = UUID.randomUUID();
+        sound = instrumentSounds.get(instrument);
         this.instrument = instrument;
+        lastActivity = System.currentTimeMillis();
     }
 
     @Override
@@ -41,25 +49,28 @@ public class Musician {
         return gson.toJson(this);
     }
 
-    public static Instrument getInstrumentFromArgs(String ... args){
+    public static void checkInstrumentFromArgs(String ... args){
         if(args.length < 1){
             System.out.println("Please provide the instrument as a command-line argument.");
             System.exit(1);
-        }
-
-        try{
-            return Instrument.valueOf(args[0].toUpperCase());
-        }catch (IllegalArgumentException e){
+        } else if (!instrumentSounds.containsKey(args[0])) {
             System.out.println("Invalid Instrument.");
             System.exit(1);
         }
-
-        return null;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Instrument instrument = getInstrumentFromArgs(args);
-        Musician musician = new Musician(instrument);
+
+        // Fill in the instrument list with their sound.
+        instrumentSounds.put("PIANO", "ti-ta-ti");
+        instrumentSounds.put("TRUMPET", "pouet");
+        instrumentSounds.put("FLUTE", "trulu");
+        instrumentSounds.put("VIOLIN", "gzi-gzi");
+        instrumentSounds.put("DRUM", "boum-boum");
+
+        checkInstrumentFromArgs(args);
+
+        Musician musician = new Musician(args[0]);
         musician.play();
     }
 

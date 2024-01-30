@@ -7,7 +7,7 @@ public enum Instrument {
     VIOLIN("gzi-gzi"),
     DRUM("boum-boum");
 
-    private final String sound;
+    private final String sound ;
     Instrument(String sound) {
         this.sound = sound;
     }
