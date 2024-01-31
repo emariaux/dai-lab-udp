@@ -1,14 +1,10 @@
 package ch.heig.dai.lab.udp.auditor;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.util.ArrayList;
-import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
