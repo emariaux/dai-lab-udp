@@ -5,8 +5,10 @@ import com.google.gson.GsonBuilder;
 
 import java.util.*;
 
+/**
+ * This class represents an orchestra.
+ */
 public class Orchestra {
-
     private final List<Musician> musicians = new ArrayList<>();
     private final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
@@ -14,8 +16,10 @@ public class Orchestra {
 
     private final static HashMap<String, String> instrumentSounds = new HashMap<>();
 
+    /**
+     * Static block to initialize the mapping of instruments to sounds.
+     */
     static {
-        // Fill in the instrument list with their sound.
         instrumentSounds.put("PIANO", "ti-ta-ti");
         instrumentSounds.put("TRUMPET", "pouet");
         instrumentSounds.put("FLUTE", "trulu");
@@ -24,6 +28,12 @@ public class Orchestra {
     }
 
 
+    /**
+     * Retrieves the instrument associated with a given sound.
+     *
+     * @param sound The sound for which to find the instrument.
+     * @return The instrument associated with the given sound, or null if not found.
+     */
     private String getInstrumentFromSound(String sound){
         // Iterates each entry of hashmap
         for(Map.Entry<String, String> instrument : instrumentSounds.entrySet()){
@@ -37,13 +47,17 @@ public class Orchestra {
         return null;
     }
 
+    /**
+     * Adds a musician to the orchestra.
+     *
+     * @param message The message containing musician information.
+     */
     public void addMusician(String message){
         Sound sound = gson.fromJson(message, Sound.class);
 
         Musician musician = new Musician(sound.getUuid(), getInstrumentFromSound(sound.getSound()));
 
         if(!musicians.contains(musician)){
-            // Adds the musician
             musicians.add(musician);
         }else {
             for(var m : musicians){
@@ -54,6 +68,11 @@ public class Orchestra {
         }
     }
 
+    /**
+     * Retrieves the list of active musicians in JSON format.
+     *
+     * @return The JSON representation of the list of active musicians.
+     */
     public String getActiveMusicians(){
         // Removes the musicians who are inactive for 5 seconds.
         musicians.removeIf(musician -> musician.getLastActivity() < System.currentTimeMillis() - 5000);

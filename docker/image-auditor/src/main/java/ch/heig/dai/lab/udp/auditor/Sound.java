@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+/**
+ * This class represents a sound produced by a musician.
+ */
 @Getter
 @Setter
 public class Sound {

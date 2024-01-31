@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -20,9 +21,14 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * This class represents a musician producing sounds.
+ */
+@Slf4j
 @Getter
 @Setter
 public class Musician {
+
     private final static String IPADDRESS = "239.255.22.5";
     private final static int PORT = 9904;
 
@@ -31,18 +37,19 @@ public class Musician {
             .excludeFieldsWithoutExposeAnnotation()
             .setPrettyPrinting()
             .create();
+
     @Expose
     private UUID uuid;
 
     private String instrument;
+
     @Expose
     private String sound;
 
-    //@Expose
-    //private long lastActivity;
-
+    /**
+     * Static block to initialize the mapping of instruments to sounds.
+     */
     static {
-        // Fill in the instrument list with their sound.
         instrumentSounds.put("PIANO", "ti-ta-ti");
         instrumentSounds.put("TRUMPET", "pouet");
         instrumentSounds.put("FLUTE", "trulu");
@@ -54,43 +61,54 @@ public class Musician {
         uuid = UUID.randomUUID();
         sound = instrumentSounds.get(instrument.toUpperCase());
         this.instrument = instrument;
-        //lastActivity = System.currentTimeMillis();
     }
 
+    /**
+     * Converts the musician object to its JSON representation.
+     *
+     * @return The JSON representation of the musician.
+     */
     @Override
     public String toString() {
         return gson.toJson(this);
     }
 
+    /**
+     * Checks if the instrument is provided as a command-line argument and if the instrument exists.
+     *
+     * @param args The command-line arguments.
+     */
     public static void checkInstrumentFromArgs(String ... args){
         if(args.length < 1){
-            System.out.println("Please provide the instrument as a command-line argument.");
+            log.error("Please provide an instrument as a command-line argument.");
             System.exit(1);
         } else if (!instrumentSounds.containsKey(args[0].toUpperCase())) {
-            System.out.println("Invalid Instrument.");
+            log.error("Invalid Instrument.");
             System.exit(1);
         }
     }
 
+    /**
+     * Sends the sound produced by the musician over UDP multicast.
+     *
+     * @param musician The musician producing the sound.
+     */
     private static void sendSound(Musician musician) {
         try (DatagramSocket socket = new DatagramSocket()) {
             InetSocketAddress dest_address = new InetSocketAddress(IPADDRESS, PORT);
-
-            // Updates the last activity time before sending the new packet.
-           // musician.setLastActivity(System.currentTimeMillis());
 
             byte[] payload = musician.toString().getBytes(UTF_8);
             var packet = new DatagramPacket(payload, payload.length, dest_address);
 
             socket.send(packet);
-            System.out.println("Sound...");
+            log.info("Sound...");
 
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            log.error(ex.getMessage());
         }
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) {
         checkInstrumentFromArgs(args);
 
         Musician musician = new Musician(args[0]);
@@ -98,6 +116,5 @@ public class Musician {
         // Sends sound every second.
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleAtFixedRate(() -> sendSound(musician), 0, 1, TimeUnit.SECONDS);
-
     }
 }

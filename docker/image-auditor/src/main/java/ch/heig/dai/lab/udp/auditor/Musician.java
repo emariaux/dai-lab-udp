@@ -6,7 +6,9 @@ import lombok.Setter;
 import java.util.Objects;
 import java.util.UUID;
 
-
+/**
+ * This class represents a musician in the orchestra.
+ */
 @Getter
 @Setter
 public class Musician {
@@ -21,6 +23,12 @@ public class Musician {
         this.lastActivity = System.currentTimeMillis();
     }
 
+    /**
+     * Checks if two musicians are equal based on their UUIDs.
+     *
+     * @param o The object to compare with.
+     * @return True if the musicians have the same UUID, false otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -29,6 +37,11 @@ public class Musician {
         return Objects.equals(uuid, musician.uuid);
     }
 
+    /**
+     * Generates a hash code based on the musician's UUID.
+     *
+     * @return The hash code.
+     */
     public int hashCode() {
         return Objects.hash(uuid);
     }
